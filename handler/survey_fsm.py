@@ -1,7 +1,7 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram import types
-
+from config import bot
 
 #Finite State Machine
 class Survey(StatesGroup):
@@ -41,8 +41,11 @@ async def process_age(message: types.Message, state: FSMContext):
 
 async def cb_cause(cb: types.CallbackQuery):
     await cb.answer(text=cb.data)
-async def process_rating(message: types.Message, state: FSMContext):
-    rating = message.text
+
+
+
+async def process_rating(message: types.CallbackQuery, state: FSMContext):
+    rating = message.data
     if not rating.isdigit():
         await message.answer('Выберите из кнопок!')
     else:
@@ -50,7 +53,7 @@ async def process_rating(message: types.Message, state: FSMContext):
             data['rating'] = rating
 
             await Survey.next()
-            await message.answer('Почему вы так оценили? [Напишите пару слов 😊]')
+            await bot.send_message(chat_id=message.from_user.id, text=f'Почему вы оценили на ( {rating} ) ? [Напишите пару слов 😊]')
 
 
 

@@ -33,8 +33,8 @@ if __name__ == "__main__":
     dp.register_message_handler(start_survey, Text(equals='Опрос'))
     dp.register_message_handler(process_name, state=Survey.name)
     dp.register_message_handler(process_age, state=Survey.age)
-    dp.register_message_handler(process_rating, state=Survey.rating)
     dp.register_message_handler(process_cause, state=Survey.cause)
+    dp.register_callback_query_handler(process_rating, lambda call: call.data.isdigit(), state=Survey.rating)
     dp.register_callback_query_handler(cb_cause, lambda call: int(call.data) < 6 and int(call.data) > 0)
 
     executor.start_polling(dp)
