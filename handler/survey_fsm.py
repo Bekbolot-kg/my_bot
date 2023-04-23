@@ -2,8 +2,9 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram import types
 from config import bot
+from db.base import insert_survey, init_db, create_tables
 
-#Finite State Machine
+
 class Survey(StatesGroup):
     name = State()
     age = State()
@@ -53,7 +54,8 @@ async def process_rating(message: types.CallbackQuery, state: FSMContext):
             data['rating'] = rating
 
             await Survey.next()
-            await bot.send_message(chat_id=message.from_user.id, text=f'Почему вы оценили на ( {rating} ) ? [Напишите пару слов 😊]')
+            await bot.send_message(chat_id=message.from_user.id,
+                                   text=f'Почему вы оценили на  <b>{rating}</b> ?   [Напишите пару слов 😊]', parse_mode='html')
 
 
 
@@ -61,5 +63,16 @@ async def process_cause(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['cause'] = message.text
 
-        await message.answer('Спасибо что прошли наш опрос 🙂😘')
+        name = data.get('name')
+        age = data.get('age')
+        rating = data.get('rating')
+        cause = data.get('cause')
+
+        init_db()
+        create_tables()
+        insert_survey(name, age, rating, cause)
+
+        print(data)
+
+        await message.answer('Спасибо что прошли наш опрос 🙂')
         await state.finish()
